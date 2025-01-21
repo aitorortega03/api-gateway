@@ -11,7 +11,7 @@ spring:
         - id: games-route
           uri: http://localhost:8080
           predicates:
-            - Path=/api/v1/games
+            - Path=/api/v1/games/**
           filters:
             - AuthenticationFilter
   endpoints:
