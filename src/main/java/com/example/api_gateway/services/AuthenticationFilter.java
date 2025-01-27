@@ -34,25 +34,19 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
       if (validator.isSecured.test(request)){
         if (isAuthMissing(request)) {
-          return onError(exchange, HttpStatus.UNAUTHORIZED);
+          return onError(exchange);
         }
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        System.out.println(authHeader);
 
         if (Objects.nonNull(authHeader) && authHeader.startsWith("Bearer ")) {
           authHeader = authHeader.substring(7);
         } else {
-          return onError(exchange, HttpStatus.UNAUTHORIZED);
+          return onError(exchange);
         }
-
-        System.out.println(authHeader);
 
         if (jwtUtils.isExpired(authHeader)) {
-          return onError(exchange, HttpStatus.UNAUTHORIZED);
+          return onError(exchange);
         }
-
-        System.out.println(authHeader);
-        System.out.println(jwtUtils.getUserIdFromToken(authHeader).toString());
 
         serverHttpRequest = exchange.getRequest()
           .mutate()
@@ -63,9 +57,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     });
   }
 
-  private Mono<Void> onError(ServerWebExchange exchange, HttpStatus status) {
+  private Mono<Void> onError(ServerWebExchange exchange) {
     ServerHttpResponse response = exchange.getResponse();
-    response.setStatusCode(status);
+    response.setStatusCode(HttpStatus.UNAUTHORIZED);
     return null;
   }
 
